@@ -221,4 +221,79 @@ public class LectureControllerTest {
             assertEquals(jsonReponse, "이미 수강신청한 강의입니다.");
         });
     }
+
+    @Test
+    public void 강의신청_성공(){
+        // given
+        LectureEntity lectureEntity = LectureEntity.builder()
+                .name("강의4")
+                .teacherName("선생님4")
+                .description("설명4")
+                .lectureDate(LocalDate.now().plusDays(1))
+                .maxEnrollment(30)
+                .currentEnrollment(0)
+                .build();
+        lectureRepository.save(lectureEntity);
+
+        // when
+        // then
+        assertDoesNotThrow(()->{
+            mockMvc.perform(post("/lectures/" + lectureEntity.getId() + "/enrollments")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("1"))
+                    .andExpect(status().isOk());
+        });
+    }
+
+    @Test
+    public void 신청강의조회_강의신청을하지않음(){
+        // given
+        // when
+        // then
+        assertDoesNotThrow(()->{
+            String jsonReponse =
+                    mockMvc.perform(get("/users/1/enrollments"))
+                            .andExpect(status().isOk())
+                            .andReturn()
+                            .getResponse()
+                            .getContentAsString();
+            assertEquals(jsonReponse, "[]");
+        });
+    }
+
+    @Test
+    public void 신청강의조회_강의신청을함(){
+        // given
+        LectureEntity lectureEntity = LectureEntity.builder()
+                .name("강의4")
+                .teacherName("선생님4")
+                .description("설명4")
+                .lectureDate(LocalDate.now().plusDays(1))
+                .maxEnrollment(30)
+                .currentEnrollment(0)
+                .build();
+        lectureRepository.save(lectureEntity);
+        assertDoesNotThrow(()-> {
+            mockMvc.perform(
+                    post("/lectures/" + lectureEntity.getId() + "/enrollments")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("1"))
+                    .andExpect(status().isOk());
+        });
+
+        // when
+        // then
+        assertDoesNotThrow(()->{
+            String jsonReponse =
+                    mockMvc.perform(get("/users/1/enrollments"))
+                            .andExpect(status().isOk())
+                            .andReturn()
+                            .getResponse()
+                            .getContentAsString();
+            List<LectureEntity> lectures = List.copyOf(objectMapper.readValue(jsonReponse, new TypeReference<List<LectureEntity>>() {}));
+            assertEquals(lectures.size(), 1);
+            LectureEntity lectureExpect = lectureRepository.findById(lectureEntity.getId()).orElseThrow();
+            assertEquals(lectures.get(0), lectureExpect);
+        });
+    }
 }
