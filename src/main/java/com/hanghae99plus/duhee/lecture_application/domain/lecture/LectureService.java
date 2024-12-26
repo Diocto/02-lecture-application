@@ -31,6 +31,8 @@ public class LectureService {
         if (alreadyEnrolledLecture != null)
             throw new IllegalArgumentException("이미 수강신청한 강의입니다.");
 
+        lectureEntity.setCurrentEnrollment(lectureEntity.getCurrentEnrollment() + 1);
+        this.lectureRepository.save(lectureEntity);
         return this.userLectureEnrollmentRepository.save(UserLectureEnrollmentEntity.builder().userId(userId).lectureId(lectureId).build());
     }
 
