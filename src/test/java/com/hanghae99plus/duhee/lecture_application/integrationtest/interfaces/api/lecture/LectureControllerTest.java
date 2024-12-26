@@ -1,4 +1,4 @@
-package integrationtest.interfaces.api.lecture;
+package com.hanghae99plus.duhee.lecture_application.integrationtest.interfaces.api.lecture;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
