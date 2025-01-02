@@ -1,5 +1,6 @@
 package com.hanghae99plus.duhee.lecture_application.domain.lecture;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +22,9 @@ public class LectureService {
         return this.lectureRepository.findLecturesAfter(targetDate);
     }
 
+    @Transactional
     public UserLectureEnrollmentEntity enrollUserToLecture(Long userId, Long lectureId) {
-        LectureEntity lectureEntity = this.lectureRepository.findById(lectureId).orElseThrow(() -> new IllegalArgumentException("해당 강의를 찾을 수 없습니다."));
+        LectureEntity lectureEntity = this.lectureRepository.findByIdWithLock(lectureId).orElseThrow(() -> new IllegalArgumentException("해당 강의를 찾을 수 없습니다."));
         if (!lectureEntity.isEnrollable())
             throw new IllegalArgumentException("해당 강의는 수강신청이 불가능 합니다.");
 
